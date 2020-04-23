@@ -49,6 +49,11 @@
       display: block;
     }
   }
+  &:active{
+    .icon-marker-tooltip {
+      display: block;
+    }
+  }
 }
 
 .icon-marker-tooltip {
