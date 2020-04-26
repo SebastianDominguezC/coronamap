@@ -13,13 +13,22 @@ class IndexPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      total: 0
+      total: 0,
+      deaths: 0,
+      recovered: 0,
+      mortality: '0%',
+      recovery: '0%'
     }
   }
 
   async componentDidMount() {
+    let numberWithCommas = (x) => {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
     let response;
     let totalCases;
+    let totalDeaths;
+    let totalRecovered;
     try {
       response = await axios.get('https://corona.lmao.ninja/v2/countries');
 
@@ -31,10 +40,23 @@ class IndexPage extends React.Component {
     totalCases = data.reduce((acc, country) => {
       return acc + country.cases
     }, 0);
-    console.log(totalCases);
+    totalDeaths = data.reduce((acc, country) => {
+      return acc + country.deaths
+    }, 0);
+    totalRecovered = data.reduce((acc, country) => {
+      return acc + country.recovered
+    }, 0);
+
+    let mortalityRate = ((totalDeaths / totalCases)*100).toFixed(2).toString() + '%';
+    let recoveryRate = ((totalRecovered / totalCases)*100).toFixed(2).toString() + '%';
+    console.log(mortalityRate, recoveryRate);
 
     this.setState({
-      total: totalCases
+      total: numberWithCommas(totalCases),
+      deaths: numberWithCommas(totalDeaths),
+      recovered: numberWithCommas(totalRecovered),
+      mortality: mortalityRate,
+      recovery: recoveryRate
     });
   }
 
@@ -142,6 +164,10 @@ class IndexPage extends React.Component {
         </Map>
 
         <h3>Total cases: {this.state.total}</h3>
+        <h3>Deaths: {this.state.deaths}</h3>
+        <h3>Recovered: {this.state.recovered}</h3>
+        <h3>Mortality: {this.state.mortality}</h3>
+        <h3>Recovery: {this.state.recovery}</h3>
       </Layout>
     );
   }
